@@ -1,0 +1,1 @@
+nohup node src/app.js &
