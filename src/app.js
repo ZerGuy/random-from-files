@@ -14,12 +14,16 @@ app.get('/', (req, res) => {
 })
 
 app.post('/randomPhrases', async (req, res) => {
-    if (!req.body?.request_options?.body?.files) {
-        res.error('Чё за херня? Укажи request body и key "files"')
+    if (!Array.isArray(req.body?.request_options?.body)) {
+        res.status(400)
+        res.json({
+            error: 'Произошла какая-то херня',
+            requestBody: req.body,
+        })
         return;
     }
 
-    const fileNames = req.body.request_options.body.files.split(",").map(s => s.trim())
+    const fileNames = req.body.request_options.body.find(it => it.key === "files").value.split(",").map(s => s.trim())
     const response = {}
     const promises = fileNames.map(async (fileName) => {
         const line = await getRandomLineFromFile(fileName);
