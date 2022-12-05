@@ -14,7 +14,9 @@ app.get('/', (req, res) => {
 })
 
 app.post('/randomPhrases', async (req, res) => {
-    if (!Array.isArray(req.body?.request_options?.body)) {
+    console.log("Incoming request: ");
+    console.log(JSON.stringify(req.body, null, 2));
+    if (!req.body?.files) {
         res.status(400)
         res.json({
             error: 'Произошла какая-то херня',
@@ -23,7 +25,7 @@ app.post('/randomPhrases', async (req, res) => {
         return;
     }
 
-    const fileNames = req.body.request_options.body.find(it => it.key === "files").value.split(",").map(s => s.trim())
+    const fileNames = req.body.files.split(",").map(s => s.trim())
     const response = {}
     const promises = fileNames.map(async (fileName) => {
         const line = await getRandomLineFromFile(fileName);
@@ -31,11 +33,7 @@ app.post('/randomPhrases', async (req, res) => {
     })
     await Promise.all(promises)
 
-    res.json({
-        status: 200,
-        statusText: 'OK',
-        response
-    });
+    res.json(response);
 })
 
 app.listen(port, () => {
